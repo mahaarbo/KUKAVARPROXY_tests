@@ -202,7 +202,7 @@ int main(int argc, char **argv) {
       ("help,h", "produce help message")
       ("num_threads,t", po::value<int>(), "set number of threads, default=1")
       ("num_tests,r", po::value<int>(), "set number of tests, default=100")
-      ("e6axis,e", po::value<bool>(), "true is e6axis, false is int, default=false");
+      ("e6axis,e", po::value<bool>(), "1 is e6axis, 0 is int, default=0");
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, desc), vm);
     po::notify(vm);
