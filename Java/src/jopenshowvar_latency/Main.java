@@ -6,7 +6,7 @@ public class Main {
 	int NUM_THREAD = 5;
 	int num_tests = 5000;
 	boolean e6axis = true;
-	// Parse command line input
+	// Ugly fast way of parsing command line input
 	for (int i = 0; i < args.length; i++){
 	    switch (args[i].charAt(0)) {
 	    case '-':
