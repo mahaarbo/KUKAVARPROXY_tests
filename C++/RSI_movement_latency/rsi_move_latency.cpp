@@ -87,7 +87,7 @@ int main(int argc, char** argv)
   int test_i = 0;
   int direction = 1;
   int dir_step_i = 0;
-  double delta_deg = 2.0;//2.0;
+  double delta_deg = 0.5;//2.0;
   double delta = 3.141592653589*delta_deg/180.0;
   bool just_moved = false;
   move_timer.start();
@@ -109,18 +109,25 @@ int main(int argc, char** argv)
       // Case 2: Clear serial buffer if just moved
       else if (just_moved)
 	{
-	  if (!kuka_rsi_hw_interface.read())
-	    {
-	      std::cerr << "ERROR READING RSI WHILE IN JUST MOVED" << std::endl;
-	      return -1;
-	    }
-	  kuka_rsi_hw_interface.write(0.0);
-	  int res = read(fd,c,1);
-	  if (res <= 0 && c[0] != 'A')
-	  {
-	    just_moved = false;
-	    move_timer.start();
+	  // if (!kuka_rsi_hw_interface.read())
+	  //   {
+	  //     std::cerr << "ERROR READING RSI WHILE IN JUST MOVED" << std::endl;
+	  //     return -1;
+	  //   }
+	  // kuka_rsi_hw_interface.write(0.0);
+	  // int res = read(fd,c,1);
+	  // if (c[0] != 'A')
+	  // {
+	  //   just_moved = false;
+	  //   move_timer.start();
+	  // }
+	  while(read(fd,c,1)>0){
+	    kuka_rsi_hw_interface.read();
+	    kuka_rsi_hw_interface.write(0.0);
+	    
 	  }
+	  just_moved = false;
+	  move_timer.start();
 	}
       else
 	{
@@ -135,19 +142,21 @@ int main(int argc, char** argv)
 	      std::cerr<<"ERROR READING RSI" << std::endl;
 	      return -1;
 	    }
-	  int res = read(fd,d,1);
-	  while ( d[0] == 'A' || res != -1) {
-	    res = read(fd,d,1);
-	    kuka_rsi_hw_interface.write(0.0);
-	    kuka_rsi_hw_interface.read();
-	  }
+	  //int res = read(fd,d,1);
+	  // CLEAR SERIAL
+	  //while ( d[0] == 'A' || res != -1) {
+	  //  res = read(fd,d,1);
+	  //  kuka_rsi_hw_interface.write(0.0);
+	  //  kuka_rsi_hw_interface.read();
+	  //}
 	  boost::timer::auto_cpu_timer t(9,format);
 	  kuka_rsi_hw_interface.write(delta*direction);
-	  res = read(fd,d,1);
-	  while ( ((d[0] != 'A') || (res == -1)))// && (t.elapsed().wall < wait_11ms) )
-	  {
-	    res = read(fd,d,1);
-	  }
+	  //res = read(fd,d,1);
+	  // while ( ((d[0] != 'A') || (res == -1)))// && (t.elapsed().wall < wait_11ms) )
+	  // {
+	  //   res = read(fd,d,1);
+	  //}
+	  while(read(fd,d,1) == -1){}
 	  t.stop();
 	  if (d[0] != 'A')
 	    {
